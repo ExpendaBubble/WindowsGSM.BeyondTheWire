@@ -11,7 +11,7 @@ namespace WindowsGSM.Plugins
 {
     public class BTW : SteamCMDAgent
     {
-        // - Plugin Details
+        // Plugin Details
         public Plugin Plugin = new Plugin
         {
             name = "WindowsGSM.BeyondTheWire", // WindowsGSM.XXXX
@@ -22,59 +22,43 @@ namespace WindowsGSM.Plugins
             color = "#ffc40b" // Color Hex
         };
 
-        // - Settings properties for SteamCMD installer
+        // Settings properties for SteamCMD installer
         public override bool loginAnonymous => true;
         public override string AppId => "1064780"; // Game server appId, the BTW dedicated server is 1064780
 
-        // - Standard Constructor and properties
+        // Standard Constructor and properties
         public BTW(ServerConfig serverData) : base(serverData) => base.serverData = _serverData = serverData;
         private readonly ServerConfig _serverData;
         public string Error, Notice;
 
 
-        // - Game server Fixed variables
+        // Game server Fixed variables
         public override string StartPath => "WireGameServer.exe"; // Game server start path
         public string FullName = "Beyond The Wire Dedicated Server"; // Game server FullName
         public bool AllowsEmbedConsole = true;  // Does this server support output redirect?
-        public int PortIncrements = 1; // This tells WindowsGSM how many ports should skip after installation
-        public object QueryMethod = new UT3(); // Query method should be use on current server type. Accepted value: null or new A2S() or new FIVEM() or new UT3()
+        public int PortIncrements = 10; // This tells WindowsGSM how many ports should skip after installation
+        public object QueryMethod = new A2S(); // Query method should be use on current server type. Accepted value: null or new A2S() or new FIVEM() or new UT3()
 
 
-        // - Game server default values
+        // Game server default values
         public string Port = "7887"; // Default port
         public string QueryPort = "27165"; // Default query port
         public string Defaultmap = ""; // Default map name
         public string Maxplayers = "100"; // Default maxplayers
-        public string Additional = ""; // Additional server start parameter
+        public string Additional = "RANDOM=ALWAYS FIXEDMAXTICKRATE=50"; // Additional server start parameter
 
+        // TODO: Updating default Server.cfg with new ServerName
+        public async void CreateServerCFG() {} 
 
-        // - Create a default cfg for the game server after installation
-        public async void CreateServerCFG()
-        {
-            // Creating config path
-            string configDir = Path.Combine(ServerPath.GetServersServerFiles(_serverData.ServerID), @"WireGame\ServerConfig");
-            Directory.CreateDirectory(configDir);
-
-            // cfg files
-            string serverCFG = Path.Combine(configDir, "Server.cfg");
-
-            var sb = new StringBuilder();
-            sb.Append($"-log");
-            sb.Append(string.IsNullOrWhiteSpace(_serverData.ServerIP) ? string.Empty : $" MULTIHOME={_serverData.ServerIP}");
-            sb.Append(string.IsNullOrWhiteSpace(_serverData.ServerPort) ? string.Empty : $" Port={_serverData.ServerPort}");
-            sb.Append(string.IsNullOrWhiteSpace(_serverData.ServerQueryPort) ? string.Empty : $" QueryPort={_serverData.ServerQueryPort}");
-            sb.Append(string.IsNullOrWhiteSpace(_serverData.ServerMaxPlayer) ? string.Empty : $" FIXEDMAXPLAYERS={_serverData.ServerMaxPlayer}");
-            sb.Append(string.IsNullOrWhiteSpace(_serverData.ServerParam) ? string.Empty : $" {_serverData.ServerParam}");
-        }
-
-
-        // - Start server function, return its Process to WindowsGSM
+        // Start server function, return its Process to WindowsGSM
         public async Task<Process> Start()
         {
             string runPath = Path.Combine(ServerPath.GetServersServerFiles(_serverData.ServerID), "WireGame\\Binaries\\Win64\\WireGameServer.exe");
 
-            string param = "-log";
-            param += $" {_serverData.ServerParam}";
+            string param = $"{_serverData.ServerParam}";
+            param += string.IsNullOrWhiteSpace(_serverData.ServerPort) ? string.Empty : $" Port={_serverData.ServerPort}";
+            param += string.IsNullOrWhiteSpace(_serverData.ServerQueryPort) ? string.Empty : $" QueryPort={_serverData.ServerQueryPort}";
+            param += " -log -fullcrashdump";
 
             // Prepare Process
             var p = new Process
@@ -129,8 +113,7 @@ namespace WindowsGSM.Plugins
             }
         }
 
-
-        // - Stop server function
+        // Stop server function
         public async Task Stop(Process p) => await Task.Run(() => { p.Kill(); });
     }
 }
