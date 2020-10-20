@@ -11,8 +11,11 @@ WindowsGSM plugin to add support for Beyond The Wire Dedicated Server
 
 ## Features
 ✅ Automatic game and query ports
+
 ✅ Map rotation type & maximum tick rate available as custom launch options
+
 ❌ MULTIHOME & FIXEDMAXPLAYERS must be added manually as custom launch options
+
 ❌ Default configuration files aren't modified after installation and must edited by hand: WireGame\ServerConfig\Server.cfg etc.
 
 ## Helpful Links 
@@ -22,6 +25,7 @@ WindowsGSM plugin to add support for Beyond The Wire Dedicated Server
 
 ## Disclaimer
 I don't know C#. It does what it says, but probably needs a little work to reach its maximum potential.
+
 Special thanks to DiscoveryOV and Battlefield Duck for providing the snippets I shamelessly scraped together.
 
 ## License
